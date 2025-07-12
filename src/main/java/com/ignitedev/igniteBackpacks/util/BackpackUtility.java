@@ -60,6 +60,7 @@ public class BackpackUtility {
     ItemStack chestplate = inventory.getChestplate();
 
     if (!BackpackUtility.isSupported(chestplate)) {
+      packetManager.removeBackpack(player);
       return;
     }
     Bukkit.getScheduler()

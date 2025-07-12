@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -22,7 +23,10 @@ public class EquipBackpackListener implements Listener {
 
   @EventHandler
   public void onRightClick(PlayerArmorChangeEvent event) {
-    ItemStack item = event.getOldItem();
+    if (event.getSlot() != EquipmentSlot.CHEST) {
+      return;
+    }
+    ItemStack item = event.getNewItem();
 
     if (!BackpackUtility.isSupported(item)) {
       return;
