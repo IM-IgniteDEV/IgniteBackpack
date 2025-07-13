@@ -30,9 +30,9 @@ public final class IgniteBackpacks extends JavaPlugin {
     getCommand("backpack").setExecutor(new BackpacksAdminCommand());
 
     Bukkit.getScheduler().runTaskTimer(this, new RenderBackpacksTask(packetManager), 20, 20);
-}
+  }
 
-    @Override
+  @Override
   public void onDisable() {
     // Plugin shutdown logic
   }

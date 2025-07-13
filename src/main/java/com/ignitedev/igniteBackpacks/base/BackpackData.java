@@ -1,15 +1,14 @@
 package com.ignitedev.igniteBackpacks.base;
 
 import com.comphenix.protocol.events.PacketContainer;
-import lombok.Data;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.Data;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 @Data
 public class BackpackData {

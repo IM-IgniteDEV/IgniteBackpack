@@ -317,11 +317,13 @@ public class ArmorStandPacketManager {
 
   /**
    * Shows all backpacks within render distance to the specified player
+   *
    * @param player The player who should see the backpacks
    */
   public void showAllBackpacksFor(Player player) {
     int distance = config.getBackpackRenderDistanceBlocks();
-    List<org.bukkit.entity.Entity> nearbyEntities = player.getNearbyEntities(distance, distance, distance);
+    List<org.bukkit.entity.Entity> nearbyEntities =
+        player.getNearbyEntities(distance, distance, distance);
     UUID uniqueId = player.getUniqueId();
 
     for (BackpackData backpackData : backpacksData.values()) {
@@ -344,6 +346,7 @@ public class ArmorStandPacketManager {
 
   /**
    * Hides all backpacks from the specified player
+   *
    * @param player The player to hide backpacks from
    */
   public void hideAllBackpacksFrom(Player player) {
@@ -360,11 +363,13 @@ public class ArmorStandPacketManager {
 
   /**
    * Hides backpacks that are no longer in range of the player
+   *
    * @param player The player to update visibility for
    */
   public void hideOutOfRangeBackpacks(Player player) {
     int distance = config.getBackpackRenderDistanceBlocks();
-    List<org.bukkit.entity.Entity> nearbyEntities = player.getNearbyEntities(distance, distance, distance);
+    List<org.bukkit.entity.Entity> nearbyEntities =
+        player.getNearbyEntities(distance, distance, distance);
     UUID uniqueId = player.getUniqueId();
 
     for (BackpackData backpackData : backpacksData.values()) {
@@ -379,7 +384,6 @@ public class ArmorStandPacketManager {
       }
     }
   }
-
 
   // ==================== Utility Methods ====================
 

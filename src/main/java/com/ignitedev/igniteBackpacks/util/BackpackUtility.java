@@ -1,8 +1,8 @@
 package com.ignitedev.igniteBackpacks.util;
 
 import com.ignitedev.igniteBackpacks.IgniteBackpacks;
-import com.ignitedev.igniteBackpacks.config.BackpackConfig;
 import com.ignitedev.igniteBackpacks.base.ModelData;
+import com.ignitedev.igniteBackpacks.config.BackpackConfig;
 import com.ignitedev.igniteBackpacks.packet.ArmorStandPacketManager;
 import com.twodevsstudio.simplejsonconfig.interfaces.Autowired;
 import lombok.experimental.UtilityClass;

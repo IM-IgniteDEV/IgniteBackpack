@@ -16,22 +16,20 @@ import org.jetbrains.annotations.NotNull;
 public class PlayerArmorChangeEvent extends Event implements Cancellable {
 
   private static final HandlerList handlers = new HandlerList();
-
-  @Setter private boolean cancelled;
-
   private final Player player;
   private final EquipmentSlot slot;
   private final ItemStack oldItem;
   private final ItemStack newItem;
   private final Reason reason;
+  @Setter private boolean cancelled;
+
+  public static HandlerList getHandlerList() {
+    return handlers;
+  }
 
   @Override
   @NotNull
   public HandlerList getHandlers() {
-    return handlers;
-  }
-
-  public static HandlerList getHandlerList() {
     return handlers;
   }
 

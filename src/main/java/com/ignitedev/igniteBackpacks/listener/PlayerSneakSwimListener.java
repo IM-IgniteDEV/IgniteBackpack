@@ -52,7 +52,7 @@ public class PlayerSneakSwimListener implements Listener {
   private void updateModel(Player player, boolean isSneaking, boolean isSwimming) {
     EntityEquipment equipment = player.getEquipment();
 
-    if(equipment == null){
+    if (equipment == null) {
       return;
     }
     ItemStack itemStack = equipment.getChestplate();

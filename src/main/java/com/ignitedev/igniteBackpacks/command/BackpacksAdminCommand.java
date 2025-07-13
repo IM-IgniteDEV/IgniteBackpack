@@ -1,6 +1,5 @@
 package com.ignitedev.igniteBackpacks.command;
 
-import com.ignitedev.aparecium.util.ItemUtility;
 import com.ignitedev.aparecium.util.text.TextUtility;
 import com.ignitedev.igniteBackpacks.base.ModelData;
 import com.ignitedev.igniteBackpacks.config.BackpackConfig;
