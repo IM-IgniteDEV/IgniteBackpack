@@ -27,7 +27,7 @@ public final class IgniteBackpacks extends JavaPlugin {
     Bukkit.getPluginManager()
         .registerEvents(new PlayerDeathRespawnListener(packetManager, this), this);
 
-    getCommand("backpack").setExecutor(new BackpacksAdminCommand());
+    getCommand("backpackadmin").setExecutor(new BackpacksAdminCommand());
 
     Bukkit.getScheduler().runTaskTimer(this, new RenderBackpacksTask(packetManager), 20, 20);
   }

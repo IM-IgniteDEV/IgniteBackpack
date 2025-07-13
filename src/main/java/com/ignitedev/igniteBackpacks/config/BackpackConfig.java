@@ -20,7 +20,6 @@ public class BackpackConfig extends Config {
       "&cUsage: /backpacksadmin support/add/remove [<modelName>]";
   private String createdNewBackpackMessage = "&aSuccessfully created new backpack";
   private String removedBackpackMessage = "&aSuccessfully removed backpack";
-  private String backpackAdminCommandPermission = "backpacks.admin.command";
 
   public ModelData getByModelId(int modelId) {
     return supportedModels.stream()

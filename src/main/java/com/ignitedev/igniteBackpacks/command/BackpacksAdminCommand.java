@@ -28,7 +28,7 @@ public class BackpacksAdminCommand implements CommandExecutor {
       return false;
     }
 
-    if (!player.hasPermission(configuration.getBackpackAdminCommandPermission())) {
+    if (!player.hasPermission("backpacks.admin.command")) {
       player.sendMessage(TextUtility.colorize("&cNo permissions"));
       return false;
     }
