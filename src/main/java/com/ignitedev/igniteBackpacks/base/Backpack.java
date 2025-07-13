@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 @Data
-public class BackpackData {
+public class Backpack {
   private final UUID owner;
   private int armorStandId;
   private BukkitTask updateTask;
@@ -19,7 +19,7 @@ public class BackpackData {
   private PacketContainer passengerPacket;
   private List<UUID> visibleTo = new ArrayList<>();
 
-  public BackpackData(Player player) {
+  public Backpack(Player player) {
     this.owner = player.getUniqueId();
     visibleTo.add(owner);
   }

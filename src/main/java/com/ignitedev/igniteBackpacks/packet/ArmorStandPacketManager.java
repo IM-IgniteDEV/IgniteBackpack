@@ -8,7 +8,7 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.Pair;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.ignitedev.igniteBackpacks.IgniteBackpacks;
-import com.ignitedev.igniteBackpacks.base.BackpackData;
+import com.ignitedev.igniteBackpacks.base.Backpack;
 import com.ignitedev.igniteBackpacks.config.BackpackConfig;
 import com.twodevsstudio.simplejsonconfig.interfaces.Autowired;
 import java.util.*;
@@ -35,7 +35,7 @@ public class ArmorStandPacketManager {
   private final IgniteBackpacks plugin;
   private final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
 
-  @Getter private final Map<UUID, BackpackData> backpacksData = new ConcurrentHashMap<>();
+  @Getter private final Map<UUID, Backpack> backpacksData = new ConcurrentHashMap<>();
 
   // ==================== Public API ====================
 
@@ -51,16 +51,16 @@ public class ArmorStandPacketManager {
       return;
     }
     // Initialize backpack data
-    BackpackData backpackData = new BackpackData(player);
-    backpacksData.put(playerId, backpackData);
+    Backpack backpack = new Backpack(player);
+    backpacksData.put(playerId, backpack);
 
     // Set up armor stand
-    int armorStandId = spawnArmorStand(player, backpackData);
-    backpackData.setArmorStandId(armorStandId);
+    int armorStandId = spawnArmorStand(player, backpack);
+    backpack.setArmorStandId(armorStandId);
 
     // Configure and start updates
-    configureArmorStand(player, backpackData);
-    startUpdateTask(backpackData);
+    configureArmorStand(player, backpack);
+    startUpdateTask(backpack);
   }
 
   /**
@@ -69,11 +69,11 @@ public class ArmorStandPacketManager {
    * @param player The player to remove the backpack from
    */
   public void removeBackpack(Player player) {
-    BackpackData backpackData = backpacksData.remove(player.getUniqueId());
+    Backpack backpack = backpacksData.remove(player.getUniqueId());
 
-    if (backpackData != null) {
-      backpackData.getUpdateTask().cancel();
-      destroyArmorStand(backpackData.getArmorStandId());
+    if (backpack != null) {
+      backpack.getUpdateTask().cancel();
+      destroyArmorStand(backpack.getArmorStandId());
     }
   }
 
@@ -84,7 +84,7 @@ public class ArmorStandPacketManager {
    * @param backpack The new backpack item
    */
   public void updateBackpackAppearance(Player player, ItemStack backpack) {
-    BackpackData backpackData = backpacksData.get(player.getUniqueId());
+    Backpack backpackData = backpacksData.get(player.getUniqueId());
 
     if (backpackData != null) {
       equipArmorStand(player, backpack);
@@ -93,7 +93,7 @@ public class ArmorStandPacketManager {
 
   // ==================== Packet Management ====================
 
-  private int spawnArmorStand(Player player, BackpackData backpackData) {
+  private int spawnArmorStand(Player player, Backpack backpack) {
     int entityId = NEXT_ENTITY_ID.getAndDecrement();
 
     // Create spawn packet
@@ -101,15 +101,15 @@ public class ArmorStandPacketManager {
     PacketContainer metadataPacket = createMetadataPacket(entityId);
 
     // Store packets for later use
-    backpackData.addSpawnPacket(spawnPacket);
-    backpackData.addSpawnPacket(metadataPacket);
+    backpack.addSpawnPacket(spawnPacket);
+    backpack.addSpawnPacket(metadataPacket);
 
     // Update visibility
-    updateVisibility(backpackData);
+    updateVisibility(backpack);
     return entityId;
   }
 
-  private void configureArmorStand(Player player, BackpackData backpackData) {
+  private void configureArmorStand(Player player, Backpack backpack) {
     // Set initial position and rotation
     correctRotation(player);
 
@@ -117,15 +117,17 @@ public class ArmorStandPacketManager {
     Bukkit.getScheduler().runTaskLater(plugin, () -> setBackpackAsPassenger(player), 1);
   }
 
-  private void startUpdateTask(BackpackData backpackData) {
-    Player player = backpackData.getPlayer();
-    if (player == null) return;
+  private void startUpdateTask(Backpack backpack) {
+    Player player = backpack.getPlayer();
 
+    if (player == null) {
+      return;
+    }
     BukkitTask task =
         Bukkit.getScheduler()
             .runTaskTimer(
                 plugin, () -> correctRotation(player), UPDATE_DELAY_TICKS, UPDATE_INTERVAL_TICKS);
-    backpackData.setUpdateTask(task);
+    backpack.setUpdateTask(task);
   }
 
   // ==================== Packet Creation ====================
@@ -176,7 +178,7 @@ public class ArmorStandPacketManager {
   }
 
   private void equipArmorStand(Player player, ItemStack backpack) {
-    BackpackData backpackData = backpacksData.get(player.getUniqueId());
+    Backpack backpackData = backpacksData.get(player.getUniqueId());
 
     if (backpackData == null) {
       return;
@@ -217,28 +219,28 @@ public class ArmorStandPacketManager {
   }
 
   private void setBackpackAsPassenger(Player player) {
-    BackpackData backpackData = backpacksData.get(player.getUniqueId());
+    Backpack backpack = backpacksData.get(player.getUniqueId());
 
-    if (backpackData == null) {
+    if (backpack == null) {
       return;
     }
     // Create mount packet
     PacketContainer mountPacket = new PacketContainer(PacketType.Play.Server.MOUNT);
     mountPacket.getIntegers().write(0, player.getEntityId());
-    mountPacket.getIntegerArrays().write(0, new int[] {backpackData.getArmorStandId()});
+    mountPacket.getIntegerArrays().write(0, new int[] {backpack.getArmorStandId()});
 
     // Store and send the packet
-    backpackData.setPassengerPacket(mountPacket);
-    backpackData.getVisibleToPlayers().forEach(receiver -> sendPackets(receiver, mountPacket));
+    backpack.setPassengerPacket(mountPacket);
+    backpack.getVisibleToPlayers().forEach(receiver -> sendPackets(receiver, mountPacket));
   }
 
   private void correctRotation(Player player) {
-    BackpackData backpackData = backpacksData.get(player.getUniqueId());
+    Backpack backpack = backpacksData.get(player.getUniqueId());
 
-    if (backpackData == null) {
+    if (backpack == null) {
       return;
     }
-    int armorStandId = backpackData.getArmorStandId();
+    int armorStandId = backpack.getArmorStandId();
     byte byteYaw = (byte) ((player.getLocation().getYaw() * 256.0F) / 360.0F);
 
     // Head rotation
@@ -256,15 +258,15 @@ public class ArmorStandPacketManager {
     entityLook.getBooleans().write(0, false); // On ground
 
     // Send rotation updates to all viewers
-    backpackData
+    backpack
         .getVisibleToPlayers()
         .forEach(receiver -> sendPackets(receiver, headRotation, entityLook));
   }
 
   // ==================== Visibility Management ====================
 
-  private void updateVisibility(BackpackData backpackData) {
-    Player backpackOwner = backpackData.getPlayer();
+  private void updateVisibility(Backpack backpack) {
+    Player backpackOwner = backpack.getPlayer();
 
     if (backpackOwner == null) {
       return;
@@ -275,7 +277,7 @@ public class ArmorStandPacketManager {
       }
 
       if (isInRange(backpackOwner, onlinePlayer)) {
-        if (!backpackData.getVisibleTo().contains(onlinePlayer.getUniqueId())) {
+        if (!backpack.getVisibleTo().contains(onlinePlayer.getUniqueId())) {
           showBackpackTo(onlinePlayer, backpackOwner);
         }
       } else {
@@ -285,20 +287,20 @@ public class ArmorStandPacketManager {
   }
 
   private void showBackpackTo(Player viewer, Player backpackOwner) {
-    BackpackData backpackData = backpacksData.get(backpackOwner.getUniqueId());
+    Backpack backpack = backpacksData.get(backpackOwner.getUniqueId());
 
-    if (backpackData == null) {
+    if (backpack == null) {
       return;
     }
-    backpackData.addVisibleTo(viewer.getUniqueId());
-    backpackData.getSpawnPackets().forEach(packet -> sendPackets(viewer, packet));
+    backpack.addVisibleTo(viewer.getUniqueId());
+    backpack.getSpawnPackets().forEach(packet -> sendPackets(viewer, packet));
 
     // Send passenger packet after a tick
     Bukkit.getScheduler()
         .runTaskLater(
             plugin,
             () -> {
-              PacketContainer passengerPacket = backpackData.getPassengerPacket();
+              PacketContainer passengerPacket = backpack.getPassengerPacket();
               if (passengerPacket != null) {
                 sendPackets(viewer, passengerPacket);
               }
@@ -307,11 +309,11 @@ public class ArmorStandPacketManager {
   }
 
   private void hideBackpackFrom(Player viewer, Player backpackOwner) {
-    BackpackData backpackData = backpacksData.get(backpackOwner.getUniqueId());
+    Backpack backpack = backpacksData.get(backpackOwner.getUniqueId());
 
-    if (backpackData != null) {
-      backpackData.removeVisibleTo(viewer.getUniqueId());
-      destroyArmorStandForViewer(backpackData.getArmorStandId(), viewer);
+    if (backpack != null) {
+      backpack.removeVisibleTo(viewer.getUniqueId());
+      destroyArmorStandForViewer(backpack.getArmorStandId(), viewer);
     }
   }
 
@@ -326,16 +328,16 @@ public class ArmorStandPacketManager {
         player.getNearbyEntities(distance, distance, distance);
     UUID uniqueId = player.getUniqueId();
 
-    for (BackpackData backpackData : backpacksData.values()) {
+    for (Backpack backpack : backpacksData.values()) {
       // Skip if already visible to this player
-      if (backpackData.getVisibleTo().contains(uniqueId)) {
+      if (backpack.getVisibleTo().contains(uniqueId)) {
         continue;
       }
 
-      Player dataPlayer = backpackData.getPlayer();
+      Player dataPlayer = backpack.getPlayer();
       // Skip if backpack owner is not nearby
       if (!nearbyEntities.contains(dataPlayer)) {
-        backpackData.removeVisibleTo(uniqueId);
+        backpack.removeVisibleTo(uniqueId);
         continue;
       }
 
@@ -352,11 +354,11 @@ public class ArmorStandPacketManager {
   public void hideAllBackpacksFrom(Player player) {
     UUID uniqueId = player.getUniqueId();
 
-    for (BackpackData backpackData : backpacksData.values()) {
-      if (backpackData.getVisibleTo().contains(uniqueId)) {
-        backpackData.removeVisibleTo(uniqueId);
+    for (Backpack backpack : backpacksData.values()) {
+      if (backpack.getVisibleTo().contains(uniqueId)) {
+        backpack.removeVisibleTo(uniqueId);
         // Send destroy packet for the armor stand to this player
-        destroyArmorStandForViewer(backpackData.getArmorStandId(), player);
+        destroyArmorStandForViewer(backpack.getArmorStandId(), player);
       }
     }
   }
@@ -372,15 +374,15 @@ public class ArmorStandPacketManager {
         player.getNearbyEntities(distance, distance, distance);
     UUID uniqueId = player.getUniqueId();
 
-    for (BackpackData backpackData : backpacksData.values()) {
-      if (!backpackData.getVisibleTo().contains(uniqueId)) {
+    for (Backpack backpack : backpacksData.values()) {
+      if (!backpack.getVisibleTo().contains(uniqueId)) {
         continue;
       }
 
-      Player dataPlayer = backpackData.getPlayer();
+      Player dataPlayer = backpack.getPlayer();
       if (dataPlayer != null && !nearbyEntities.contains(dataPlayer)) {
-        backpackData.removeVisibleTo(uniqueId);
-        destroyArmorStandForViewer(backpackData.getArmorStandId(), player);
+        backpack.removeVisibleTo(uniqueId);
+        destroyArmorStandForViewer(backpack.getArmorStandId(), player);
       }
     }
   }

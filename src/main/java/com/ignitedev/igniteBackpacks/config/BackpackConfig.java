@@ -16,7 +16,7 @@ public class BackpackConfig extends Config {
   private int backpackRenderDistanceBlocks = 30;
   private String cannotEquipBackpackMessage =
       "&cCannot equip backpack as you are wearing something!";
-  private String wrongCommandUsageMessage =
+  private String adminCommandUsage =
       "&cUsage: /backpacksadmin support/add/remove [<modelName>]";
   private String createdNewBackpackMessage = "&aSuccessfully created new backpack";
   private String removedBackpackMessage = "&aSuccessfully removed backpack";
