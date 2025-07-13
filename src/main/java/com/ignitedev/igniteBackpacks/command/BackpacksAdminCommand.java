@@ -1,92 +1,71 @@
 package com.ignitedev.igniteBackpacks.command;
 
-import com.ignitedev.aparecium.util.text.TextUtility;
+import com.ignitedev.aparecium.acf.BaseCommand;
+import com.ignitedev.aparecium.acf.annotation.*;
+import com.ignitedev.aparecium.util.MessageUtility;
 import com.ignitedev.igniteBackpacks.base.ModelData;
 import com.ignitedev.igniteBackpacks.config.BackpackConfig;
 import com.ignitedev.igniteBackpacks.util.BackpackUtility;
 import com.twodevsstudio.simplejsonconfig.interfaces.Autowired;
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.bukkit.inventory.EntityEquipment;
 
-public class BackpacksAdminCommand implements CommandExecutor {
+@CommandPermission("backpacks.admin.command")
+@CommandAlias("backpacksadmin|bpa|bpadmin")
+public class BackpacksAdminCommand extends BaseCommand {
 
   @Autowired private static BackpackConfig configuration;
 
-  @Override
-  public boolean onCommand(
-      @NotNull CommandSender sender,
-      @NotNull Command command,
-      @NotNull String label,
-      @NotNull String[] args) {
+  @HelpCommand
+  @Default
+  public void onHelp(Player player) {
+    MessageUtility.send(player, configuration.getAdminCommandUsage());
+  }
 
-    if (!(sender instanceof Player player)) {
-      Bukkit.getConsoleSender().sendMessage("[!] This command can only be performed by a Player!");
-      return false;
+  @Subcommand("support")
+  @Syntax("<modelName> <modelId> <sneakModelId> <swimModelId>")
+  public void onSupport(
+      Player player, String modelName, String modelId, String sneakModelId, String swimModelId) {
+    try {
+      addModelSupport(modelName, modelId, sneakModelId, swimModelId);
+      MessageUtility.send(player, "&aAdded support for" + modelName + "!");
+    } catch (NumberFormatException ignored) {
+      MessageUtility.send(player, "&cModel ID must be a 7 digit number!");
     }
+  }
 
-    if (!player.hasPermission("backpacks.admin.command")) {
-      player.sendMessage(TextUtility.colorize("&cNo permissions"));
-      return false;
+  @Subcommand("reload")
+  public void onReload(Player player) {
+    configuration.reload();
+    MessageUtility.send(player, "&aConfig reloaded!");
+  }
+
+  @Subcommand("remove")
+  public void onRemove(Player player) {
+    EntityEquipment equipment = player.getEquipment();
+
+    if (equipment == null) {
+      return;
     }
+    BackpackUtility.removeCustomModelData(player.getEquipment().getItemInMainHand());
+    MessageUtility.send(player, configuration.getRemovedBackpackMessage());
+  }
 
-    if (args.length == 1) {
-      if (!args[0].equalsIgnoreCase("remove")) {
-        if (args[0].equalsIgnoreCase("reload")) {
-          configuration.reload();
-          sender.sendMessage(TextUtility.colorize("&aConfig reloaded!"));
-          return true;
-        }
-        sender.sendMessage(TextUtility.colorize(configuration.getWrongCommandUsageMessage()));
-        return false;
-      }
-      BackpackUtility.removeCustomModelData(player.getEquipment().getItemInMainHand());
-      sender.sendMessage(TextUtility.colorize(configuration.getRemovedBackpackMessage()));
-      return true;
+  @Subcommand("add")
+  public void onAdd(Player player, String modelName) {
+    ModelData modelData = configuration.getByModelName(modelName);
+
+    if (modelData == null) {
+      MessageUtility.send(player, configuration.getAdminCommandUsage());
+      return;
     }
+    EntityEquipment equipment = player.getEquipment();
 
-    if (args.length == 2) {
-      if (!args[0].equalsIgnoreCase("add")) {
-        sender.sendMessage(TextUtility.colorize(configuration.getWrongCommandUsageMessage()));
-        return false;
-      }
-      String modelName = args[1];
-      ModelData modelData = configuration.getByModelName(modelName);
-
-      if (modelData == null) {
-        sender.sendMessage(TextUtility.colorize(configuration.getWrongCommandUsageMessage()));
-        return false;
-      }
-      BackpackUtility.addModelData(player.getEquipment().getItemInMainHand(), modelData);
-      sender.sendMessage(TextUtility.colorize(configuration.getCreatedNewBackpackMessage()));
-      return true;
+    if (equipment == null) {
+      return;
     }
-
-    if (args.length == 5) {
-      if (!args[0].equalsIgnoreCase("support")) {
-        sender.sendMessage(TextUtility.colorize(configuration.getWrongCommandUsageMessage()));
-        return false;
-      }
-
-      String modelName = args[1];
-      String modelIdString = args[2];
-      String sneakModelIdString = args[3];
-      String swimModelIdString = args[4];
-
-      try {
-        addModelSupport(modelName, modelIdString, sneakModelIdString, swimModelIdString);
-        sender.sendMessage(TextUtility.colorize("&aAdded support for" + modelName + "!"));
-        return true;
-      } catch (NumberFormatException ignored) {
-        sender.sendMessage(TextUtility.colorize("&cModel ID must be a 7 digit number!"));
-        return false;
-      }
-    }
-
-    return true;
+    BackpackUtility.addModelData(equipment.getItemInMainHand(), modelData);
+    MessageUtility.send(player, configuration.getCreatedNewBackpackMessage());
   }
 
   public void addModelSupport(
@@ -98,13 +77,14 @@ public class BackpacksAdminCommand implements CommandExecutor {
         || swimModelIdString.length() != 7) {
       throw new NumberFormatException("Model ID must be a 7 digit number!");
     }
-
     int modelId = Integer.parseInt(modelIdString);
     int sneakModelId = Integer.parseInt(sneakModelIdString);
     int swimModelId = Integer.parseInt(swimModelIdString);
 
     configuration.reload();
-    configuration.getSupportedModels().add(new ModelData(modelName, modelId, sneakModelId, swimModelId));
+    configuration
+        .getSupportedModels()
+        .add(new ModelData(modelName, modelId, sneakModelId, swimModelId));
     configuration.save();
   }
 }
