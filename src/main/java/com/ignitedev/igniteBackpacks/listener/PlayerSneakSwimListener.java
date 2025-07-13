@@ -32,7 +32,6 @@ public class PlayerSneakSwimListener implements Listener {
         || !packetManager.getBackpacksData().containsKey(player.getUniqueId())) {
       return;
     }
-
     updateModel(player, event.isSneaking(), player.isSwimming());
   }
 
@@ -44,7 +43,6 @@ public class PlayerSneakSwimListener implements Listener {
       if (!packetManager.getBackpacksData().containsKey(player.getUniqueId())) {
         return;
       }
-
       updateModel(player, player.isSneaking(), event.isSwimming());
     }
   }
