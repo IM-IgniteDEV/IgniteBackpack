@@ -2,6 +2,6 @@ name: IgniteBackpacks
 version: '1.0.0'
 main: com.ignitedev.igniteBackpacks.IgniteBackpacks
 api-version: '1.21'
-depend: [ ProtocolLib ]
+depend: [ ProtocolLib, NBTAPI ]
 commands:
   backpackadmin:
