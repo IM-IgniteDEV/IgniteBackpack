@@ -29,10 +29,7 @@ public class Backpack {
   }
 
   public List<Player> getVisibleToPlayers() {
-    return visibleTo.stream()
-        .map(Bukkit::getPlayer)
-        .filter(Objects::nonNull)
-        .toList();
+    return visibleTo.stream().map(Bukkit::getPlayer).filter(Objects::nonNull).toList();
   }
 
   public void addSpawnPacket(PacketContainer packet) {
@@ -54,5 +51,4 @@ public class Backpack {
   public List<PacketContainer> getSpawnPackets() {
     return new ArrayList<>(spawnPackets);
   }
-
 }

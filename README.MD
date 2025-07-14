@@ -1,6 +1,7 @@
 # IgniteBackpacks
 
-IgniteBackpacks is a high-performance plugin that adds customizable backpacks to your server. It uses ProtocolLib to render backpacks as 3D models on players using armor stands, providing a seamless and immersive experience.
+IgniteBackpacks is a high-performance plugin that adds customizable backpacks to your server. It uses ProtocolLib to
+render backpacks as 3D models on players using armor stands, providing a seamless and immersive experience.
 
 ---
 

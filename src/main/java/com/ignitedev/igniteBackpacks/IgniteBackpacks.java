@@ -8,12 +8,11 @@ import com.ignitedev.igniteBackpacks.listener.*;
 import com.ignitedev.igniteBackpacks.packet.ArmorStandPacketManager;
 import com.ignitedev.igniteBackpacks.task.RenderBackpacksTask;
 import com.twodevsstudio.simplejsonconfig.SimpleJSONConfig;
+import java.util.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Locale;
 
 public final class IgniteBackpacks extends JavaPlugin {
 

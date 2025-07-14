@@ -221,7 +221,12 @@ public class PlayerArmorListener implements Listener {
 
   // Utility methods
   private boolean isPlayerInventoryClick(InventoryClickEvent event) {
-    return event.getClickedInventory().getType() == InventoryType.PLAYER
+    Inventory clickedInventory = event.getClickedInventory();
+
+    if (clickedInventory == null) {
+      return false;
+    }
+    return clickedInventory.getType() == InventoryType.PLAYER
         && getTopInventoryType(event) == InventoryType.CRAFTING;
   }
 
@@ -265,7 +270,7 @@ public class PlayerArmorListener implements Listener {
   private ItemStack getItemInHand(Player player, EquipmentSlot hand) {
     EntityEquipment equipment = player.getEquipment();
 
-    if(equipment == null){
+    if (equipment == null) {
       return null;
     }
     return hand == EquipmentSlot.HAND

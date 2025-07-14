@@ -53,7 +53,8 @@ public class BackpackUtility {
     item.setItemMeta(itemMeta);
   }
 
-  public void updateBackpack(Player player, IgniteBackpacks plugin, ArmorStandPacketManager packetManager) {
+  public void updateBackpack(
+      Player player, IgniteBackpacks plugin, ArmorStandPacketManager packetManager) {
     Bukkit.getScheduler().runTask(plugin, () -> packetManager.removeBackpack(player));
 
     PlayerInventory inventory = player.getInventory();

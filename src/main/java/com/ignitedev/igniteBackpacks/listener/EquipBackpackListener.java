@@ -1,6 +1,6 @@
 package com.ignitedev.igniteBackpacks.listener;
 
-import com.ignitedev.aparecium.util.text.TextUtility;
+import com.ignitedev.aparecium.util.MessageUtility;
 import com.ignitedev.igniteBackpacks.config.BackpackConfig;
 import com.ignitedev.igniteBackpacks.event.PlayerArmorChangeEvent;
 import com.ignitedev.igniteBackpacks.packet.ArmorStandPacketManager;
@@ -37,7 +37,7 @@ public class EquipBackpackListener implements Listener {
     PlayerInventory inventory = player.getInventory();
 
     if (inventory.getChestplate() != null) {
-      player.sendMessage(TextUtility.colorize(config.getCannotEquipBackpackMessage()));
+      MessageUtility.send(player, config.getPrefix() + config.getCannotEquipBackpackMessage());
       return;
     }
     packetManager.attachBackpackToPlayer(player);

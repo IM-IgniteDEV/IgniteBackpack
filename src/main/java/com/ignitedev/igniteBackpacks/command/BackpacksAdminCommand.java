@@ -28,16 +28,18 @@ public class BackpacksAdminCommand extends BaseCommand {
       Player player, String modelName, String modelId, String sneakModelId, String swimModelId) {
     try {
       addModelSupport(modelName, modelId, sneakModelId, swimModelId);
-      MessageUtility.send(player, "&aAdded support for" + modelName + "!");
+      MessageUtility.send(
+          player, configuration.getPrefix() + "&aAdded support for" + modelName + "!");
     } catch (NumberFormatException ignored) {
-      MessageUtility.send(player, "&cModel ID must be a 7 digit number!");
+      MessageUtility.send(
+          player, configuration.getPrefix() + "&cModel ID must be a 7 digit number!");
     }
   }
 
   @Subcommand("reload")
   public void onReload(Player player) {
     configuration.reload();
-    MessageUtility.send(player, "&aConfig reloaded!");
+    MessageUtility.send(player, configuration.getPrefix() + "&aConfig reloaded!");
   }
 
   @Subcommand("remove")
@@ -48,7 +50,8 @@ public class BackpacksAdminCommand extends BaseCommand {
       return;
     }
     BackpackUtility.removeCustomModelData(player.getEquipment().getItemInMainHand());
-    MessageUtility.send(player, configuration.getRemovedBackpackMessage());
+    MessageUtility.send(
+        player, configuration.getPrefix() + configuration.getRemovedBackpackMessage());
   }
 
   @Subcommand("add")
@@ -65,10 +68,11 @@ public class BackpacksAdminCommand extends BaseCommand {
       return;
     }
     BackpackUtility.addModelData(equipment.getItemInMainHand(), modelData);
-    MessageUtility.send(player, configuration.getCreatedNewBackpackMessage());
+    MessageUtility.send(
+        player, configuration.getPrefix() + configuration.getCreatedNewBackpackMessage());
   }
 
-  public void addModelSupport(
+  private void addModelSupport(
       String modelName, String modelIdString, String sneakModelIdString, String swimModelIdString)
       throws NumberFormatException {
 
