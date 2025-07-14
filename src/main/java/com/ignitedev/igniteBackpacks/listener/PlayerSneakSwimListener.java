@@ -1,11 +1,12 @@
 package com.ignitedev.igniteBackpacks.listener;
 
+import com.ignitedev.igniteBackpacks.IgniteBackpacks;
 import com.ignitedev.igniteBackpacks.base.ModelData;
 import com.ignitedev.igniteBackpacks.config.BackpackConfig;
 import com.ignitedev.igniteBackpacks.packet.ArmorStandPacketManager;
+import com.ignitedev.igniteBackpacks.util.BackpackUtility;
 import com.twodevsstudio.simplejsonconfig.interfaces.Autowired;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,15 +22,13 @@ public class PlayerSneakSwimListener implements Listener {
   @Autowired private static BackpackConfig configuration;
 
   private final ArmorStandPacketManager packetManager;
+  private final IgniteBackpacks plugin;
 
   @EventHandler
   public void onSneak(PlayerToggleSneakEvent event) {
-
     Player player = event.getPlayer();
 
-    if (player.isFlying()
-        || player.isSwimming()
-        || !packetManager.getBackpacksData().containsKey(player.getUniqueId())) {
+    if (player.isFlying() || player.isSwimming() || player.isGliding()) {
       return;
     }
     updateModel(player, event.isSneaking(), player.isSwimming());
@@ -37,17 +36,15 @@ public class PlayerSneakSwimListener implements Listener {
 
   @EventHandler
   public void onSwim(EntityToggleSwimEvent event) {
-
-    Entity entity = event.getEntity();
-    if (entity instanceof Player player) {
-      if (!packetManager.getBackpacksData().containsKey(player.getUniqueId())) {
-        return;
-      }
+    if (event.getEntity() instanceof Player player) {
       updateModel(player, player.isSneaking(), event.isSwimming());
     }
   }
 
   private void updateModel(Player player, boolean isSneaking, boolean isSwimming) {
+    if (!packetManager.getBackpacksData().containsKey(player.getUniqueId())) {
+      return;
+    }
     EntityEquipment equipment = player.getEquipment();
 
     if (equipment == null) {
