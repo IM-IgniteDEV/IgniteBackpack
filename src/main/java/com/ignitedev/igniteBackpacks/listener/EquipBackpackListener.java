@@ -9,6 +9,8 @@ import com.twodevsstudio.simplejsonconfig.interfaces.Autowired;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
@@ -20,6 +22,30 @@ public class EquipBackpackListener implements Listener {
   private final ArmorStandPacketManager packetManager;
 
   private final IgniteBackpacks plugin;
+
+  /**
+   * @implNote This method is supposed to help you equip not equipable items like backpacks (Depending on material)
+   */
+  @EventHandler
+  public void onInventoryClick(InventoryClickEvent event){
+    InventoryType.SlotType slotType = event.getSlotType();
+
+    if(slotType != InventoryType.SlotType.ARMOR){
+      return;
+    }
+    ItemStack cursorItem = event.getCursor();
+    ItemStack currentItem = event.getCurrentItem();
+
+    if(cursorItem == null){
+      return;
+    }
+    if(!BackpackUtility.isSupported(cursorItem)){
+      return;
+    }
+    event.setCurrentItem(cursorItem);
+    event.setCursor(currentItem);
+  }
+
 
   @EventHandler
   public void onEquip(PlayerArmorChangeEvent event) {
